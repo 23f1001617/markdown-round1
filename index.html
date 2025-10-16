@@ -9,82 +9,74 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #ffffff;
+            color: #333333;
+            transition: background-color 0.3s, color 0.3s;
         }
-        #markdown-output {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        img {
+        #markdown-output img {
             max-width: 100%;
             border-radius: 8px;
         }
-        .caption {
-            text-align: center;
-            font-size: 0.9em;
-            color: #666;
+        .dark-mode {
+            background-color: #333333;
+            color: #ffffff;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #888888;
         }
         button {
-            margin: 10px 0;
             padding: 10px;
-            border: none;
-            border-radius: 5px;
+            margin-bottom: 20px;
             cursor: pointer;
-        }
-        .dark-mode {
-            background-color: #333;
-            color: #f4f4f4;
         }
     </style>
 </head>
 <body>
-    <button id="toggle-theme">Toggle Theme</button>
-    <div id="markdown-output">Loading...</div>
-    <footer>
-        <p>Footer Content Here</p>
-    </footer>
-    <!-- build-id: 2023-10-03T12:00:00Z -->
+
+<button id="toggle-theme">Toggle Theme</button>
+<div id="markdown-output">Loading...</div>
+
+<footer><!-- build-id: 2023-10-09T12:00:00Z --></footer>
+
+<script>
+    const markdownOutput = document.getElementById('markdown-output');
     
-    <script>
-        async function fetchMarkdown() {
-            try {
-                const response = await fetch('./input.md');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const text = await response.text();
-                renderMarkdown(text);
-            } catch (error) {
-                document.getElementById('markdown-output').innerHTML = 'Failed to load data.';
-            }
-        }
-
-        function renderMarkdown(markdown) {
-            const html = markdown
-                .replace(/###### (.*)/g, '<h6>$1</h6>')
-                .replace(/##### (.*)/g, '<h5>$1</h5>')
-                .replace(/#### (.*)/g, '<h4>$1</h4>')
-                .replace(/### (.*)/g, '<h3>$1</h3>')
-                .replace(/## (.*)/g, '<h2>$1</h2>')
-                .replace(/# (.*)/g, '<h1>$1</h1>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/!\[(.*?)\]\((.*?)\)/g, (match, caption, url) => {
-                    return `<div><img src="${url}" alt="${caption}"/><div class="caption">${caption}</div></div>`;
-                })
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-                .replace(/\n/g, '<br/>');
-
-            document.getElementById('markdown-output').innerHTML = html;
-        }
-
-        document.getElementById('toggle-theme').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+    fetch('./input.md')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load data.');
+            return response.text();
+        })
+        .then(text => {
+            markdownOutput.innerHTML = convertMarkdownToHTML(text);
+        })
+        .catch(error => {
+            markdownOutput.innerHTML = 'Failed to load data.';
+            console.error(error);
         });
 
-        fetchMarkdown();
-    </script>
+    function convertMarkdownToHTML(markdown) {
+        // Simple Markdown to HTML conversion
+        return markdown
+            .replace(/###### (.+)/g, '<h6>$1</h6>')
+            .replace(/##### (.+)/g, '<h5>$1</h5>')
+            .replace(/#### (.+)/g, '<h4>$1</h4>')
+            .replace(/### (.+)/g, '<h3>$1</h3>')
+            .replace(/## (.+)/g, '<h2>$1</h2>')
+            .replace(/# (.+)/g, '<h1>$1</h1>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/!\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<figure><img src="$2" alt="$1"/><figcaption>$1</figcaption></figure>')
+            .replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2">$1</a>')
+            .replace(/\n/g, '<br/>');
+    }
+
+    document.getElementById('toggle-theme').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+</script>
+
 </body>
 </html>
-<!-- build-id: 2025-10-16T12:10:50.916547 -->
+<!-- build-id: 2025-10-16T12:47:01.518290 -->
